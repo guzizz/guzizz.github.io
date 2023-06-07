@@ -276,7 +276,7 @@
         GMS
       </div>
       <div class="theme-drawer__header__layer-2__user__info__slogan mdui-text-color-white-secondary">
-        I&#39;m your slogan!
+        我是小谷，我无敌
       </div>
     </div>
   </div>
@@ -318,74 +318,6 @@
     <div class="mdui-divider"></div>
     <ul class="mdui-list" mdui-collapse="{accordion: true}" mdui-collapse>
       
-        
-          
-            <a href="/friends" target="_self" class="mdui-list-item mdui-ripple mdui-ripple-white">
-          
-              
-              
-                <i class="mdui-list-item-icon mdui-icon material-icons">&#xe0ba;</i>
-              
-              
-              <div class="mdui-list-item-content">Test1</div>
-            </a>
-        
-      
-        
-          
-            <a href="/apply-for-link" target="_self" class="mdui-list-item mdui-ripple mdui-ripple-white">
-          
-              
-                <i class="mdui-list-item-icon mdui-icon fa fa-child mdui-text-center"></i>
-              
-              
-              
-              <div class="mdui-list-item-content">Test2</div>
-            </a>
-        
-      
-        
-          
-            <a href="/galleries" target="_self" class="mdui-list-item mdui-ripple mdui-ripple-white">
-          
-              
-              
-                <i class="mdui-list-item-icon mdui-icon material-icons">home</i>
-              
-              
-              <div class="mdui-list-item-content">Test3</div>
-            </a>
-        
-      
-        
-          <div class="mdui-collapse-item">
-            <div class="mdui-collapse-item-header mdui-list-item mdui-ripple mdui-ripple-white">
-              
-              
-                <i class="mdui-list-item-icon mdui-icon material-icons">home</i>
-              
-              
-              <div class="mdui-list-item-content">Test4</div>
-              <i class="mdui-collapse-item-arrow mdui-icon material-icons">&#xe5c5;</i>
-            </div>
-            <div class="mdui-collapse-item-body mdui-list">
-              
-                
-                  <a href="/myfriends" class="mdui-list-item mdui-ripple mdui-ripple-white" target="_self">
-                
-                    TEST1
-                  </a>
-              
-                
-                  <a href="/timeline" class="mdui-list-item mdui-ripple mdui-ripple-white" target="_self">
-                
-                    TEST2
-                  </a>
-              
-            </div>
-          </div>
-        
-      
     </ul>
   
 </div>
@@ -404,6 +336,9 @@
       GMS
     </span>
     
+      <br />
+      <span onclick="window.open('http://www.miitbeian.gov.cn/', '_blank');">123456789</span>
+    
     
       <br />
       <span>
@@ -417,7 +352,12 @@
   var copyrightNow = new Date().getFullYear();
   var textContent = document.querySelector('span[year]')
   
-    textContent.textContent = copyrightNow
+    copyrightSince = 2023;
+    if (copyrightSince === copyrightNow) {
+      textContent.textContent = copyrightNow
+    } else {
+      textContent.textContent = copyrightSince + ' - ' + copyrightNow
+    }
   
 </script>
 
@@ -447,7 +387,7 @@
             GMS
           </div>
           <div class="theme-archive__header__slogan">
-            I&#39;m your slogan!
+            我是小谷，我无敌
           </div>
         </div>
         <div class="theme-spacer mdui-hidden-sm-down"></div>
@@ -481,8 +421,8 @@
           
           <div class="mdui-col-xs-6 mdui-col-md-3 theme-archive__items__item">
             <a href="/archives/2023" target="_self" class="theme-link--no-style">
-              <div class="mdui-card mdui-color-orange">
-                <div class="mdui-card-media" style="background-image: url(/images/random/43.png)"></div>
+              <div class="mdui-card mdui-color-teal">
+                <div class="mdui-card-media" style="background-image: url(/images/random/27.png)"></div>
                 <div class="theme-archive__items__content theme-archive__items__content--no-length">
                   <img class="mdui-img-circle theme-archive__items__avatar" src="/images/avatar.png" />
                   <div class="theme-archive__items__text-title">2023</div>
@@ -501,15 +441,6 @@
       </div>
       <div class="mdui-dialog-content">
         <div class="mdui-list">
-          
-            <a href="https://twitter.com" title="Twitter" class="mdui-list-item mdui-ripple" target="_blank">
-              
-                <i class="mdui-list-item-icon mdui-icon fa fa-twitter mdui-text-center"></i>&emsp;
-              
-              
-              
-              Twitter
-            </a>
           
             <a href="https://facebook.com" title="Facebook" class="mdui-list-item mdui-ripple" target="_blank">
               
