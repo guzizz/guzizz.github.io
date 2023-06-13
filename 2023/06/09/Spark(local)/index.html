@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Spark（local） |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Spark(local)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Spark（local）
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(local)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Spark（local）"><a href="#Spark（local）" class="headerlink" title="Spark（local）"></a>Spark（local）</h1><h2 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h2><p>在<code>/etc/profile</code>中配置环境变量</p>
+<p><img src="/../image_4/1.png"></p>
+<p>最好在<code>/root/.bashrc</code>中同样也进行环境变量配置</p>
+<h2 id="安装spark"><a href="#安装spark" class="headerlink" title="安装spark"></a>安装spark</h2><p>1)把我们下载好的压缩包放在<code>/export/server/</code>路径下</p>
+<p>2)解压到当前目录下</p>
+<pre><code>tar -zxvf spark-3.2.0-bin-hadoop3.2.tgz -C /export/server/
+</code></pre>
+<p>3)给spark配置一个软链接</p>
+<pre><code>ln -s /export/server/spark-3.2.0-bin-hadoop3.2 /export/server/spark
+</code></pre>
+<p><img src="/../image_4/2.png"></p>
+<h2 id="测试Spark"><a href="#测试Spark" class="headerlink" title="测试Spark"></a>测试Spark</h2><p>1)<code>bin/pyspark</code></p>
+<p>2)<code>bin/pyspark</code> 程序，可以提供一个交互式的 Python解释器环境，在这里面可以写普通python代码，以及spark代码.提交一个程序测试</p>
+<pre><code>sc.parallelize([1,2,3,4,5]).map(lambda x: x + 1).collect()
+</code></pre>
+<p>查看结果</p>
+<p><img src="/../image_4/3.png"></p>
+<p>3)当Spark程序运行时会绑定到4040端口上，是一个WEBUI端口</p>
+<p><img src="/../image_4/4.png"></p>
+<p>打开监控页面后，可以发现在程序内仅有一个Driver因为我们是Local模式，Driver即管理又干活，同时，输入jps</p>
+<p><img src="/../image_4/5.png"></p>
+<p>可以看到local模式下的唯一进程存在这个进程即是master也是worker</p>
+<p>4)bin&#x2F;spark-shell了解</p>
+<p>同样是一个解释器环境, 和<code>bin/pyspark</code>不同的是, 这个解释器环境 运行的不是python代码, 而是scala程序代码</p>
+<p><img src="/../image_4/6.png"></p>
+<p>5)bin&#x2F;spark-submit(PI)</p>
+<p>bin&#x2F;spark-submit的作用是提交指定的Spark代码到Spark环境中运行</p>
+<p>示例：bin&#x2F;spark-submit </p>
+<pre><code>/export/server/spark/examples/src/main/python/pi.py 10
+</code></pre>
+<p><img src="/../image_4/7.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(local)/" data-id="clituffk900074wyx02us1cza" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Spark(Yarn)/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Spark（Yarn）
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/09/Spark(stand-alone)/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Spark（stand-alone）</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

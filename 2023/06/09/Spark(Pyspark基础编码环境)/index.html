@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Spark（Pyspark基础编码环境） |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Spark(Pyspark基础编码环境)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Spark（Pyspark基础编码环境）
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Spark（Pyspark基础编码环境）"><a href="#Spark（Pyspark基础编码环境）" class="headerlink" title="Spark（Pyspark基础编码环境）"></a>Spark（Pyspark基础编码环境）</h1><h2 id="PySpark"><a href="#PySpark" class="headerlink" title="PySpark"></a>PySpark</h2><h4 id="什么是PySpark"><a href="#什么是PySpark" class="headerlink" title="什么是PySpark"></a>什么是PySpark</h4><p>PySpark是Spar官方提供的一个Python类库，内置了完全的Spark API，可以通过PySpark类库来编写Spark应用程序，并将其提交到Spark集群中运行。</p>
+<h4 id="本机PySpark环境配置"><a href="#本机PySpark环境配置" class="headerlink" title="本机PySpark环境配置"></a>本机PySpark环境配置</h4><p>（1）将课程资料中提供的:<code>hadoop-3.3.0</code>文件，复制到一个地方，比如我的放在<code>D:\虚拟机\ahadoop\hadoop_windows\hadoop-3.3.0</code>目录下</p>
+<p>（2）将文件夹内<code>bin</code>内的<code>hadoop.dll</code>复制到:<code>C:\Windows\System32</code>里面去</p>
+<p><img src="/../image_8/1.png"></p>
+<p>（3） 配置HADOOP_HOME环境变量指向 hadoop-3.3.0文件夹的路径</p>
+<p><img src="/../image_8/2.png"></p>
+<h3 id="Anaconda的安装"><a href="#Anaconda的安装" class="headerlink" title="Anaconda的安装"></a>Anaconda的安装</h3><p>（1）打开资料中提供的:<code>Anaconda3-2021.05-Windows-x86_64.exe</code>文件</p>
+<p>打开后点击Next</p>
+<p><img src="/../image_8/3.png"></p>
+<p>点击I Agree</p>
+<p><img src="/../image_8/4.png"></p>
+<p>点击Next</p>
+<p><img src="/../image_8/5.png"></p>
+<p>如果想要修改安装路径，可以修改，修改完点击Next</p>
+<p><img src="/../image_8/6.png"></p>
+<p>不勾选，点击Install </p>
+<p><img src="/../image_8/7.png"></p>
+<p>Finish完成安装</p>
+<p>（2）去官网下载[<a target="_blank" rel="noopener" href="https://www.anaconda.com/products/individual#Downloads]">https://www.anaconda.com/products/individual#Downloads]</a></p>
+<p>下载完之后，安装步骤参考（1）</p>
+<p>（3）配置国内源</p>
+<p>Anaconda默认源服务器在国外，网速比较慢, 配置国内源加速网络下载。打开Anaconda Prompt程序，执行：</p>
+<pre><code>conda config --set show_channel_urls yes
+</code></pre>
+<p>然后用记事本打开：</p>
+<p><code>C:\Users\用户名\.condarc</code>文件，将如下内容替换进文件内，保存即可：</p>
+<pre><code>channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+custom_channels:
+  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  msys2: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+</code></pre>
+<p><img src="/../image_8/8.png"></p>
+<p>创建虚拟环境</p>
+<p><img src="/../image_8/9.png"></p>
+<pre><code># 创建虚拟环境 pyspark, 基于Python 3.8
+conda create -n pyspark python=3.8
+
+# 切换到虚拟环境内
+conda activate pyspark
+
+# 在虚拟环境内安装包
+pip install pyhive pyspark jieba -i https://pypi.tuna.tsinghua.edu.cn/simple 
+</code></pre>
+<p><img src="/../image_8/10.png"></p>
+<p>注：之前都已完成，就不在执行了。</p>
+<h3 id="PySpark安装"><a href="#PySpark安装" class="headerlink" title="PySpark安装"></a>PySpark安装</h3><p>PySpark是Python标准类库，可以通过Python自带的pip程序进行安装或者Anaconda的库安装(conda)，在合适的虚拟环境下(课程使用pyspark这个虚拟环境)，执行如下命令即可安装：</p>
+<pre><code>pip install pyspark -i https://pypi.tuna.tsinghua.edu.cn/simple或者conda install pyspark
+</code></pre>
+<h2 id="PyCharm配置Python解释器"><a href="#PyCharm配置Python解释器" class="headerlink" title="PyCharm配置Python解释器"></a>PyCharm配置Python解释器</h2><h3 id="配置本地解释器"><a href="#配置本地解释器" class="headerlink" title="配置本地解释器"></a>配置本地解释器</h3><p><img src="/../image_8/11.png"></p>
+<h3 id="配置远程SSH-Linux解释器"><a href="#配置远程SSH-Linux解释器" class="headerlink" title="配置远程SSH Linux解释器"></a>配置远程SSH Linux解释器</h3><p>（1）设置远程SSH python pySpark 环境 </p>
+<p><img src="/../image_8/12.png"></p>
+<p><img src="/../image_8/13.png"></p>
+<p>（2）添加新的远程连接</p>
+<p><img src="/../image_8/14.png"></p>
+<p><img src="/../image_8/15.png"></p>
+<p>（3）设置虚拟机Python环境路径</p>
+<p><img src="/../image_8/16.png"></p>
+<p><img src="/../image_8/17.png"></p>
+<h3 id="WordCount代码实战"><a href="#WordCount代码实战" class="headerlink" title="WordCount代码实战"></a>WordCount代码实战</h3><h4 id="远程连接Linux系统执行程序"><a href="#远程连接Linux系统执行程序" class="headerlink" title="远程连接Linux系统执行程序"></a>远程连接Linux系统执行程序</h4><p>（1）本地准备文件word.txt</p>
+<p><img src="/../image_8/18.png"></p>
+<p>（2）切换到远程SSH 解释器执行(在Linux系统上执行)</p>
+<p><img src="/../image_8/19.png"></p>
+<p>刚开始安装的是pyspark版本3.4.0，课程要求，需要修改为3.2.0。在node2中执行：</p>
+<pre><code>conda activate pyspark
+
+pip uninstall pyspark
+
+pip install pyspark==3.2.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+</code></pre>
+<p><img src="/../image_8/20.png"></p>
+<p><img src="/../image_8/21.png"></p>
+<p>（3）执行结果如下： </p>
+<p><img src="/../image_8/22.png"></p>
+<h4 id="HDFS执行程序"><a href="#HDFS执行程序" class="headerlink" title="HDFS执行程序"></a>HDFS执行程序</h4><p>（1）上传数据到HDFS中：</p>
+<pre><code>hadoop fs -put word.txt /input/words.txt
+hadoop fs -ls /input
+</code></pre>
+<p><img src="/../image_8/23.png"></p>
+<p>（2）在Hadoop集群上运行</p>
+<pre><code># 读取文件
+  file_rdd = sc.textFile(&quot;hdfs://node1:8020/input/words.txt&quot;)
+</code></pre>
+<p>（3）执行结果如下：</p>
+<p><img src="/../image_8/24.png"></p>
+<h4 id="本地执行程序"><a href="#本地执行程序" class="headerlink" title="本地执行程序"></a>本地执行程序</h4><p>（1）读取本地文件</p>
+<pre><code># 读取文件
+file_rdd = sc.textFile(&quot;C:\\Users\\20538\\PycharmProjects\\Spark\\data\\input\\words.txt&quot;)
+</code></pre>
+<p>（2）执行效果图：</p>
+<p><img src="/../image_8/25.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/" data-id="clituffk900054wyx6fujdovd" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Hive/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Hive
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/09/Spark(Yarn)/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Spark（Yarn）</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

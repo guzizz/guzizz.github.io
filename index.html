@@ -11,7 +11,7 @@
   
   <title>
     
-    Spark基础配置
+    谷明胜
   </title>
   <!-- Icon -->
   
@@ -50,9 +50,9 @@
       <div class="video-overlay"></div>
     </div>
     <div class="video-inner text-center text-white">
-      <h1><a href="/">Spark基础配置</a></h1>
+      <h1><a href="/">谷明胜</a></h1>
       <p></p>
-      <div><img src="/images/hexo-inverted.svg" class="brand" alt="Spark基础配置"></div>
+      <div><img src="/images/hexo-inverted.svg" class="brand" alt="谷明胜"></div>
     </div>
     <div class="video-learn-more">
       <a class="anchor" href="#landingpage"><i class="fe fe-mouse"></i></a>
@@ -65,6 +65,1154 @@
     
     <h1 class="page-type-title"></h1>
     
+    
+    <article id="post-Spark(HA)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Spark(HA)/">Spark（HA）</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(HA)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Spark（HA）"><a href="#Spark（HA）" class="headerlink" title="Spark（HA）"></a>Spark（HA）</h1><h2 id="Spark-StandAlone-HA-环境搭建"><a href="#Spark-StandAlone-HA-环境搭建" class="headerlink" title="Spark StandAlone HA 环境搭建"></a>Spark StandAlone HA 环境搭建</h2><p>启动Zookeeper服务和HDFS集群</p>
+<p><img src="/../image_6/1.png"></p>
+<p><code>cd /export/server/spark/conf </code>中<code>vi spark-env.sh </code>将其中的<code>SPARK_MASTER_HOST=node1</code>删除，并增加如下信息，以达到可以用到zookeeper的动态切换master功能</p>
+<p><img src="/../image_6/2.png"></p>
+<p>通过命令<code>scp spark-env.sh node2:/export/server/spark/conf/</code></p>
+<p><code>scp spark-env.sh node3:/export/server/spark/conf/</code>将<code>spark-env.sh</code>分发到node2和node3上，且若是StandAlone集群是启动中的话，通过<code>sbin/stop-all.sh</code>命令将StandAlone集群停止</p>
+<p>在node1上启动一个master进程和全部的worker进程</p>
+<p><img src="/../image_6/3.png"></p>
+<p><img src="/../image_6/4.png"></p>
+<p>在node2上启动一个备用的master进程</p>
+<p><img src="/../image_6/5.png"></p>
+<p><img src="/../image_6/6.png"></p>
+<p>使用<code>bin/spark-submit --master spark://node1:7077 /export/server/spark/examples/src/main/python/pi.py 1000</code>命令提交一个spark任务到正在运行的master上，在完成提交后使用命令kill掉node1上的master进程，并等待node2上的备用的master进程来接收并完成这个spark任务。</p>
+<p><img src="/../image_6/7.png"></p>
+<p><img src="/../image_6/8.png"></p>
+<p>测试</p>
+<p><img src="/../image_6/9.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(HA)/" data-id="clituffk700034wyx18nnfv2d" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Hive" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Hive/">Hive</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Hive/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h1><p>​        本地模式部署本质上是将Hive默认的元数据存储介质由内嵌的Derby数据库替换为独立数据库，即MySQL数据库。本地模式部署Hive需要在一台虚拟机上同时安装MySQL和Hive，接下来，我们以虚拟机node2为例，使用本地模式部署Hive。</p>
+<h2 id="卸载原有MySQL组件"><a href="#卸载原有MySQL组件" class="headerlink" title="卸载原有MySQL组件"></a>卸载原有MySQL组件</h2><p>(1)查看MySQL服务状态</p>
+<pre><code>systemctl status mysqld.service
+</code></pre>
+<p><img src="/../image_1/1.png"></p>
+<p>(2)关闭MySQL服务</p>
+<pre><code>sudo systemctl stop mysqld.service
+</code></pre>
+<p><img src="/../image_1/2.png"></p>
+<p>(3)查找安装mysql的rpm包并卸载</p>
+<pre><code>rpm -qa | grep -i mysql
+</code></pre>
+<p><img src="/../image_1/3.png"></p>
+<p>卸载</p>
+<pre><code>yum remove mysql-community-libs-5.7.29-1.el7.x86_64
+
+mysql-community-common-5.7.29-1.el7.x86_64 mysql-community-client-5.7.29-1.el7.x86_64 mysql-community-server-5.7.29-1.el7.x86_64
+</code></pre>
+<p>(4)查找mysql相关目录 删除</p>
+<pre><code>find / -name mysql
+
+rm -rf /var/lib/mysql
+rm -rf /var/lib/mysql/mysql
+rm -rf /usr/share/mysql
+</code></pre>
+<p><img src="/../image_1/4.png"></p>
+<h2 id="MySQL安装"><a href="#MySQL安装" class="headerlink" title="MySQL安装"></a>MySQL安装</h2><p>(1) 在<code>/export/server/</code>目录下创建mysql目录，并上传MySQL压缩包</p>
+<pre><code>mkdir /export/server/mysql 
+
+sudo rz
+</code></pre>
+<p><img src="/../image_1/5.png"></p>
+<p>(2) 解压<code>mysql-5.7.29-1.el7.x86_64.rpm-bundle.tar</code> 到上述文件夹</p>
+<pre><code>tar xvf mysql-5.7.29-1.el7.x86_64.rpm-bundle.tar
+</code></pre>
+<p><img src="/../image_1/6.png"> </p>
+<p>(3) 执行安装</p>
+<pre><code>yum -y install libaio
+</code></pre>
+<p><img src="/../image_1/7.png"></p>
+<pre><code>rpm -ivh 
+
+mysql-community-common-5.7.29-1.el7.x86_64.rpm mysql-community-libs-5.7.29-1.el7.x86_64.rpm mysql-community-client-5.7.29-1.el7.x86_64.rpm mysql-community-server-5.7.29-1.el7.x86_64.rpm
+</code></pre>
+<p><img src="/../image_1/8.png"></p>
+<p>(5)MySQL初始化</p>
+<p>&lt;1&gt;初始化</p>
+<pre><code>mysqld --initialize
+</code></pre>
+<p>&lt;2&gt; 更改所属组</p>
+<pre><code>chown mysql:mysql /var/lib/mysql -R
+</code></pre>
+<p>&lt;3&gt;启动mysql</p>
+<pre><code>systemctl start mysqld.service
+</code></pre>
+<p>&lt;4&gt;查看生成的临时root密码</p>
+<pre><code>cat  /var/log/mysqld.log
+</code></pre>
+<p><img src="/../image_1/9.png"></p>
+<p>(6)登录MySQL</p>
+<pre><code>mysql -u root -p
+</code></pre>
+<p>这里输入在日志中生成的密码</p>
+<p>(7)更新root密码，设置为hadoop</p>
+<pre><code>alter user user() identified by &quot;hadoop&quot;;
+</code></pre>
+<p><img src="/../image_1/10.png"></p>
+<p>(8)授权</p>
+<pre><code>use mysql;
+
+GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;%&#39; IDENTIFIED BY &#39;hadoop&#39; WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+</code></pre>
+<h2 id="Hive安装"><a href="#Hive安装" class="headerlink" title="Hive安装"></a>Hive安装</h2><p>(1)上传压缩包 解压 设置软链接</p>
+<pre><code>tar zxvf apache-hive-3.1.2-bin.tar.gz
+
+ln -s apache-hive-3.1.2-bin hive
+</code></pre>
+<p><img src="/../image_1/11.png"></p>
+<p> <img src="/../image_1/12.png"></p>
+<p>(2)处理hive与Hadoop之间guava版本的差异</p>
+<pre><code>cd /export/server/hive/
+
+rm -rf lib/guava-19.0.jar
+
+cp /export/server/hadoop/share/hadoop/common/lib/guava-27.0-jre.jar ./lib/
+</code></pre>
+<p><img src="/../image_1/13.png"></p>
+<p>(3)修改配置文件</p>
+<p>Hive-env.sh</p>
+<pre><code>cd /export/server/hive/conf
+
+mv hive-env.sh.template hive-env.sh
+</code></pre>
+<pre><code>vim hive-env.sh
+
+export HADOOP_HOME=/export/server/hadoop
+export HIVE_CONF_DIR=/export/server/hive/conf
+export HIVE_AUX_JARS_PATH=/export/server/hive/lib
+</code></pre>
+<p><img src="/../image_1/14.png"></p>
+<p>Hive-site.xml</p>
+<pre><code>&lt;configuration&gt;
+&lt;!-- 存储元数据mysql相关配置 --&gt;
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+  &lt;value&gt;jdbc:mysql://node1:3306/hive3?createDatabaseIfNotExist=true&amp;useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
+  &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+  &lt;value&gt;root&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionPassword&lt;/name&gt;
+  &lt;value&gt;hadoop&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- H2S运行绑定host --&gt;
+&lt;property&gt;
+  &lt;name&gt;hive.server2.thrift.bind.host&lt;/name&gt;
+  &lt;value&gt;node1&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- 远程模式部署metastore metastore地址 --&gt;
+&lt;property&gt;
+  &lt;name&gt;hive.metastore.uris&lt;/name&gt;
+  &lt;value&gt;thrift://node1:9083&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- 关闭元数据存储授权  --&gt; 
+&lt;property&gt;
+  &lt;name&gt;hive.metastore.event.db.notification.api.auth&lt;/name&gt;
+  &lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+<p><img src="/../image_1/15.png"></p>
+<p>(4)上传mysql jdbc驱动到hive&#x2F;lib目录下</p>
+<pre><code>mysql-connector-java-5.1.32.jar
+</code></pre>
+<p><img src="/../image_1/16.png"></p>
+<p>(5)在hdfs创建hive储存目录</p>
+<pre><code>hadoop fs -mkdir /tmp
+hadoop fs -mkdir -p /user/hive/warehouse
+hadoop fs -chmod g+w /tmp
+hadoop fs -chmod g+w /user/hive/warehouse
+</code></pre>
+<h2 id="Hive启动"><a href="#Hive启动" class="headerlink" title="Hive启动"></a>Hive启动</h2><p>(1)启动metastore服务</p>
+<p>&lt;1&gt; 前台启动  关闭ctrl+c</p>
+<pre><code>/export/server/hive/bin/hive --service metastore
+</code></pre>
+<p>&lt;2&gt; 前台启动开启debug日志</p>
+<pre><code>/export/server/hive/bin/hive --service metastore --hiveconf 
+</code></pre>
+<pre><code>hive.root.logger=DEBUG,console  
+</code></pre>
+<p><img src="/../image_1/17.png"></p>
+<p><img src="/../image_1/18.png"></p>
+<p>&lt;3&gt; 后台启动 进程挂起  关闭使用jps+ kill -9</p>
+<pre><code>nohup /export/server/hive/bin/hive --service metastore &amp;
+</code></pre>
+<p><img src="/../image_1/19.png"></p>
+<p>(2)启动hiveserver2服务</p>
+<pre><code>nohup /export/server/hive/bin/hive --service hiveserver2 &amp;
+</code></pre>
+<p>【注】启动hiveserver2后，等待一段时间后再启动beeline连接，否则可能会连接不上</p>
+<p>(3)Beeline客户端连接</p>
+<pre><code>/export/server/hive/bin/beeline
+
+beeline&gt; ! connect jdbc:hive2://node1:10000
+beeline&gt; root
+beeline&gt; 直接回车
+</code></pre>
+<p>【注】启动hive之前先jps检查hdfs集群是否则正常运行，否则会连接错误。</p>
+<p><img src="/../image_1/20.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Hive/" data-id="clituffk800044wyxgrno173m" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Spark(Pyspark基础编码环境)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/">Spark（Pyspark基础编码环境）</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Spark（Pyspark基础编码环境）"><a href="#Spark（Pyspark基础编码环境）" class="headerlink" title="Spark（Pyspark基础编码环境）"></a>Spark（Pyspark基础编码环境）</h1><h2 id="PySpark"><a href="#PySpark" class="headerlink" title="PySpark"></a>PySpark</h2><h4 id="什么是PySpark"><a href="#什么是PySpark" class="headerlink" title="什么是PySpark"></a>什么是PySpark</h4><p>PySpark是Spar官方提供的一个Python类库，内置了完全的Spark API，可以通过PySpark类库来编写Spark应用程序，并将其提交到Spark集群中运行。</p>
+<h4 id="本机PySpark环境配置"><a href="#本机PySpark环境配置" class="headerlink" title="本机PySpark环境配置"></a>本机PySpark环境配置</h4><p>（1）将课程资料中提供的:<code>hadoop-3.3.0</code>文件，复制到一个地方，比如我的放在<code>D:\虚拟机\ahadoop\hadoop_windows\hadoop-3.3.0</code>目录下</p>
+<p>（2）将文件夹内<code>bin</code>内的<code>hadoop.dll</code>复制到:<code>C:\Windows\System32</code>里面去</p>
+<p><img src="/../image_8/1.png"></p>
+<p>（3） 配置HADOOP_HOME环境变量指向 hadoop-3.3.0文件夹的路径</p>
+<p><img src="/../image_8/2.png"></p>
+<h3 id="Anaconda的安装"><a href="#Anaconda的安装" class="headerlink" title="Anaconda的安装"></a>Anaconda的安装</h3><p>（1）打开资料中提供的:<code>Anaconda3-2021.05-Windows-x86_64.exe</code>文件</p>
+<p>打开后点击Next</p>
+<p><img src="/../image_8/3.png"></p>
+<p>点击I Agree</p>
+<p><img src="/../image_8/4.png"></p>
+<p>点击Next</p>
+<p><img src="/../image_8/5.png"></p>
+<p>如果想要修改安装路径，可以修改，修改完点击Next</p>
+<p><img src="/../image_8/6.png"></p>
+<p>不勾选，点击Install </p>
+<p><img src="/../image_8/7.png"></p>
+<p>Finish完成安装</p>
+<p>（2）去官网下载[<a target="_blank" rel="noopener" href="https://www.anaconda.com/products/individual#Downloads]">https://www.anaconda.com/products/individual#Downloads]</a></p>
+<p>下载完之后，安装步骤参考（1）</p>
+<p>（3）配置国内源</p>
+<p>Anaconda默认源服务器在国外，网速比较慢, 配置国内源加速网络下载。打开Anaconda Prompt程序，执行：</p>
+<pre><code>conda config --set show_channel_urls yes
+</code></pre>
+<p>然后用记事本打开：</p>
+<p><code>C:\Users\用户名\.condarc</code>文件，将如下内容替换进文件内，保存即可：</p>
+<pre><code>channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+custom_channels:
+  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  msys2: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+</code></pre>
+<p><img src="/../image_8/8.png"></p>
+<p>创建虚拟环境</p>
+<p><img src="/../image_8/9.png"></p>
+<pre><code># 创建虚拟环境 pyspark, 基于Python 3.8
+conda create -n pyspark python=3.8
+
+# 切换到虚拟环境内
+conda activate pyspark
+
+# 在虚拟环境内安装包
+pip install pyhive pyspark jieba -i https://pypi.tuna.tsinghua.edu.cn/simple 
+</code></pre>
+<p><img src="/../image_8/10.png"></p>
+<p>注：之前都已完成，就不在执行了。</p>
+<h3 id="PySpark安装"><a href="#PySpark安装" class="headerlink" title="PySpark安装"></a>PySpark安装</h3><p>PySpark是Python标准类库，可以通过Python自带的pip程序进行安装或者Anaconda的库安装(conda)，在合适的虚拟环境下(课程使用pyspark这个虚拟环境)，执行如下命令即可安装：</p>
+<pre><code>pip install pyspark -i https://pypi.tuna.tsinghua.edu.cn/simple或者conda install pyspark
+</code></pre>
+<h2 id="PyCharm配置Python解释器"><a href="#PyCharm配置Python解释器" class="headerlink" title="PyCharm配置Python解释器"></a>PyCharm配置Python解释器</h2><h3 id="配置本地解释器"><a href="#配置本地解释器" class="headerlink" title="配置本地解释器"></a>配置本地解释器</h3><p><img src="/../image_8/11.png"></p>
+<h3 id="配置远程SSH-Linux解释器"><a href="#配置远程SSH-Linux解释器" class="headerlink" title="配置远程SSH Linux解释器"></a>配置远程SSH Linux解释器</h3><p>（1）设置远程SSH python pySpark 环境 </p>
+<p><img src="/../image_8/12.png"></p>
+<p><img src="/../image_8/13.png"></p>
+<p>（2）添加新的远程连接</p>
+<p><img src="/../image_8/14.png"></p>
+<p><img src="/../image_8/15.png"></p>
+<p>（3）设置虚拟机Python环境路径</p>
+<p><img src="/../image_8/16.png"></p>
+<p><img src="/../image_8/17.png"></p>
+<h3 id="WordCount代码实战"><a href="#WordCount代码实战" class="headerlink" title="WordCount代码实战"></a>WordCount代码实战</h3><h4 id="远程连接Linux系统执行程序"><a href="#远程连接Linux系统执行程序" class="headerlink" title="远程连接Linux系统执行程序"></a>远程连接Linux系统执行程序</h4><p>（1）本地准备文件word.txt</p>
+<p><img src="/../image_8/18.png"></p>
+<p>（2）切换到远程SSH 解释器执行(在Linux系统上执行)</p>
+<p><img src="/../image_8/19.png"></p>
+<p>刚开始安装的是pyspark版本3.4.0，课程要求，需要修改为3.2.0。在node2中执行：</p>
+<pre><code>conda activate pyspark
+
+pip uninstall pyspark
+
+pip install pyspark==3.2.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+</code></pre>
+<p><img src="/../image_8/20.png"></p>
+<p><img src="/../image_8/21.png"></p>
+<p>（3）执行结果如下： </p>
+<p><img src="/../image_8/22.png"></p>
+<h4 id="HDFS执行程序"><a href="#HDFS执行程序" class="headerlink" title="HDFS执行程序"></a>HDFS执行程序</h4><p>（1）上传数据到HDFS中：</p>
+<pre><code>hadoop fs -put word.txt /input/words.txt
+hadoop fs -ls /input
+</code></pre>
+<p><img src="/../image_8/23.png"></p>
+<p>（2）在Hadoop集群上运行</p>
+<pre><code># 读取文件
+  file_rdd = sc.textFile(&quot;hdfs://node1:8020/input/words.txt&quot;)
+</code></pre>
+<p>（3）执行结果如下：</p>
+<p><img src="/../image_8/24.png"></p>
+<h4 id="本地执行程序"><a href="#本地执行程序" class="headerlink" title="本地执行程序"></a>本地执行程序</h4><p>（1）读取本地文件</p>
+<pre><code># 读取文件
+file_rdd = sc.textFile(&quot;C:\\Users\\20538\\PycharmProjects\\Spark\\data\\input\\words.txt&quot;)
+</code></pre>
+<p>（2）执行效果图：</p>
+<p><img src="/../image_8/25.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/" data-id="clituffk900054wyx6fujdovd" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Spark(Yarn)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Spark(Yarn)/">Spark（Yarn）</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(Yarn)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Spark（Yarn）"><a href="#Spark（Yarn）" class="headerlink" title="Spark（Yarn）"></a>Spark（Yarn）</h1><h2 id="Spark-On-YARN-环境搭建"><a href="#Spark-On-YARN-环境搭建" class="headerlink" title="Spark On YARN 环境搭建"></a>Spark On YARN 环境搭建</h2><p>确保<code>HADOOP_CONF_DIR</code>和<code>YARN_CONF_DIR</code>的环境变量正确</p>
+<p><img src="/../image_7/1.png"></p>
+<p>启动HDFS集群，zookeeper和StandAlone集群，并且启动历史服务器</p>
+<p><img src="/../image_7/2.png"></p>
+<p>利用<code>bin/pyspark --master yarn --deploy-mode client</code>将spark连接到YARN集群的客户端模式下</p>
+<p><img src="/../image_7/3.png"></p>
+<p><img src="/../image_7/4.png"></p>
+<p>测试</p>
+<p><img src="/../image_7/5.png"></p>
+<p>查看历史服务器</p>
+<p><img src="/../image_7/6.png"></p>
+<p><img src="/../image_7/7.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(Yarn)/" data-id="clituffk900064wyxg16jheiz" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Spark(local)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Spark(local)/">Spark（local）</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(local)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Spark（local）"><a href="#Spark（local）" class="headerlink" title="Spark（local）"></a>Spark（local）</h1><h2 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h2><p>在<code>/etc/profile</code>中配置环境变量</p>
+<p><img src="/../image_4/1.png"></p>
+<p>最好在<code>/root/.bashrc</code>中同样也进行环境变量配置</p>
+<h2 id="安装spark"><a href="#安装spark" class="headerlink" title="安装spark"></a>安装spark</h2><p>1)把我们下载好的压缩包放在<code>/export/server/</code>路径下</p>
+<p>2)解压到当前目录下</p>
+<pre><code>tar -zxvf spark-3.2.0-bin-hadoop3.2.tgz -C /export/server/
+</code></pre>
+<p>3)给spark配置一个软链接</p>
+<pre><code>ln -s /export/server/spark-3.2.0-bin-hadoop3.2 /export/server/spark
+</code></pre>
+<p><img src="/../image_4/2.png"></p>
+<h2 id="测试Spark"><a href="#测试Spark" class="headerlink" title="测试Spark"></a>测试Spark</h2><p>1)<code>bin/pyspark</code></p>
+<p>2)<code>bin/pyspark</code> 程序，可以提供一个交互式的 Python解释器环境，在这里面可以写普通python代码，以及spark代码.提交一个程序测试</p>
+<pre><code>sc.parallelize([1,2,3,4,5]).map(lambda x: x + 1).collect()
+</code></pre>
+<p>查看结果</p>
+<p><img src="/../image_4/3.png"></p>
+<p>3)当Spark程序运行时会绑定到4040端口上，是一个WEBUI端口</p>
+<p><img src="/../image_4/4.png"></p>
+<p>打开监控页面后，可以发现在程序内仅有一个Driver因为我们是Local模式，Driver即管理又干活，同时，输入jps</p>
+<p><img src="/../image_4/5.png"></p>
+<p>可以看到local模式下的唯一进程存在这个进程即是master也是worker</p>
+<p>4)bin&#x2F;spark-shell了解</p>
+<p>同样是一个解释器环境, 和<code>bin/pyspark</code>不同的是, 这个解释器环境 运行的不是python代码, 而是scala程序代码</p>
+<p><img src="/../image_4/6.png"></p>
+<p>5)bin&#x2F;spark-submit(PI)</p>
+<p>bin&#x2F;spark-submit的作用是提交指定的Spark代码到Spark环境中运行</p>
+<p>示例：bin&#x2F;spark-submit </p>
+<pre><code>/export/server/spark/examples/src/main/python/pi.py 10
+</code></pre>
+<p><img src="/../image_4/7.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(local)/" data-id="clituffk900074wyx02us1cza" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Spark(stand-alone)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Spark(stand-alone)/">Spark（stand-alone）</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(stand-alone)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Spark（stand-alone）"><a href="#Spark（stand-alone）" class="headerlink" title="Spark（stand-alone）"></a>Spark（stand-alone）</h1><h2 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h2><p>1)集群规划</p>
+<p>课程中使用三台Linux虚拟机来组成集群环境，分别是:</p>
+<p>node1\ node2\ node3</p>
+<p>node1运行: Spark的Master进程  和 1个Worker进程</p>
+<p>node2运行: spark的1个worker进程</p>
+<p>node3运行: spark的1个worker进程</p>
+<p>整个集群提供: 1个master进程 和 3个worker进程</p>
+<p>2)安装Anaconda</p>
+<p>我已经安装完成就不在此安装了如图</p>
+<p> <img src="/../image_5/1.png"></p>
+<p>3)配置workers文件</p>
+<p>在<code>/export/server/spark/conf</code>目录下</p>
+<pre><code># 改名，去掉后面的.template后缀
+mv workers.template workers
+
+# 编辑worker文件
+vim workers
+# 将里面的localhost删除, 追加
+node1
+node2
+node3
+到workers文件内
+</code></pre>
+<p><img src="/../image_5/2.png"> </p>
+<p>4)配置spark-env.sh文件</p>
+<pre><code># 1. 改名
+mv spark-env.sh.template spark-env.sh
+
+# 2. 编辑spark-env.sh, 在底部追加如下内容
+
+## 设置JAVA安装目录
+JAVA_HOME=/export/server/jdk
+
+## HADOOP软件配置文件目录，读取HDFS上文件和运行YARN集群
+HADOOP_CONF_DIR=/export/server/hadoop/etc/hadoop
+YARN_CONF_DIR=/export/server/hadoop/etc/hadoop
+
+## 指定spark老大Master的IP和提交任务的通信端口
+# 告知Spark的master运行在哪个机器上
+export SPARK_MASTER_HOST=node1
+# 告知sparkmaster的通讯端口
+export SPARK_MASTER_PORT=7077
+# 告知spark master的 webui端口
+SPARK_MASTER_WEBUI_PORT=8080
+
+# worker cpu可用核数
+SPARK_WORKER_CORES=1
+# worker可用内存
+SPARK_WORKER_MEMORY=1g
+# worker的工作通讯地址
+SPARK_WORKER_PORT=7078
+# worker的 webui地址
+SPARK_WORKER_WEBUI_PORT=8081
+
+## 设置历史服务器
+# 配置的意思是  将spark程序运行的历史日志 存到hdfs的/sparklog文件夹中
+SPARK_HISTORY_OPTS=&quot;-Dspark.history.fs.logDirectory=hdfs://node1:8020/sparklog/ -Dspark.history.fs.cleaner.enabled=true&quot;
+</code></pre>
+<p><img src="/../image_5/3.png"></p>
+<p>5)在HDFS上创建程序运行历史记录存放的文件夹</p>
+<pre><code>hadoop fs -mkdir /sparklog
+hadoop fs -chmod 777 /sparklog
+</code></pre>
+<p><img src="/../image_5/4.png"></p>
+<p>6)配置spark-defaults.conf文件</p>
+<pre><code># 1. 改名
+mv spark-defaults.conf.template spark-defaults.conf
+
+# 2. 修改内容, 追加如下内容
+# 开启spark的日期记录功能
+spark.eventLog.enabled   true
+# 设置spark日志记录的路径
+spark.eventLog.dir   hdfs://node1:8020/sparklog/ 
+# 设置spark日志是否启动压缩
+spark.eventLog.compress   true
+</code></pre>
+<p><img src="/../image_5/5.png"> </p>
+<p>7)将Spark安装文件夹，分发到node1,node2上</p>
+<pre><code>scp -r spark-3.1.2-bin-hadoop3.2 node2:/export/server/
+scp -r spark-3.1.2-bin-hadoop3.2 node3:/export/server/
+</code></pre>
+<p>增加软连接</p>
+<pre><code>ln -s /export/server/spark-3.1.2-bin-hadoop3.2 /export/server/spark
+</code></pre>
+<p>8)启动历史服务器</p>
+<pre><code>sbin/start-history-server.sh
+</code></pre>
+<p>9)启动Spark的Master和worker进程</p>
+<pre><code># 启动全部master和worker
+sbin/start-all.sh
+</code></pre>
+<p>10)查看Master的WEB UI</p>
+<p><img src="/../image_5/6.png"> </p>
+<h2 id="连接到StandAlone集群"><a href="#连接到StandAlone集群" class="headerlink" title="连接到StandAlone集群"></a>连接到StandAlone集群</h2><h3 id="bin-x2F-spark"><a href="#bin-x2F-spark" class="headerlink" title="bin&#x2F;spark"></a>bin&#x2F;spark</h3><pre><code>bin/pyspark --master spark://node1:7077
+# 通过--master选项来连接到 StandAlone集群
+# 如果不写--master选项, 默认是local模式运行
+</code></pre>
+<p><img src="/../image_5/7.png"> </p>
+<h3 id="bin-x2F-spark-shell"><a href="#bin-x2F-spark-shell" class="headerlink" title="bin&#x2F;spark-shell"></a>bin&#x2F;spark-shell</h3><pre><code>bin/spark-shell --master spark://node1:7077
+# 同样适用--master来连接到集群使用
+</code></pre>
+<pre><code>// 测试代码
+sc.parallelize(Array(1,2,3,4,5)).map(x=&gt; x + 1).collect()
+</code></pre>
+<p><img src="/../image_5/8.png"> </p>
+<h3 id="bin-x2F-spark-submit-PI"><a href="#bin-x2F-spark-submit-PI" class="headerlink" title="bin&#x2F;spark-submit(PI)"></a>bin&#x2F;spark-submit(PI)</h3><pre><code>bin/spark-submit--masterspark://node1:7077/export/server/spark/examples/src/main/python/pi.py 100# 同样使用--master来指定将任务提交到集群运行
+</code></pre>
+<p><img src="/../image_5/9.png"> </p>
+<h2 id="查看历史服务器WEB-UI"><a href="#查看历史服务器WEB-UI" class="headerlink" title="查看历史服务器WEB UI"></a>查看历史服务器WEB UI</h2><p>浏览器打开：<code>node1:18080</code></p>
+<p><img src="/../image_5/10.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(stand-alone)/" data-id="clituffkb00084wyx8los8hmf" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Docker" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Docker/">Docker</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Docker/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.485Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><p>1.在安装docker之前，先初始化机器环境，如果之前安装过旧版本的docker，应该先使用命令进行卸载</p>
+<p>2.进行yum源配置</p>
+<pre><code>mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+
+wget -O/etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+wget -o/etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+
+yum clean all
+yum makecache
+</code></pre>
+<p><img src="/../image_3/1.png"></p>
+<p>3.安装docker，首先需要虚拟机联网，安装yum工具</p>
+<pre><code>yum install -y yum-utils \device-mapper-persistent-data \
+lvm2--skip-broken
+</code></pre>
+<p><img src="/../image_3/2.png"></p>
+<p>4.配置网卡转发</p>
+<p>（1）写入</p>
+<pre><code>cat &lt;&lt;EOF &gt; /etc/sysctl.d/docker.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.ip_forward=1
+EOF
+</code></pre>
+<p>（2）重新加载内核参数</p>
+<pre><code>modprobe br_netfilter
+</code></pre>
+<pre><code>sysctl -p /etc/sysctl.d/docker.conf
+</code></pre>
+<p>5.利用yum进行docker安装</p>
+<pre><code>curl-o/etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+cur-o/etc/yum.repos.d/Centos-7.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+</code></pre>
+<p><img src="/../image_3/3.png"></p>
+<pre><code>#更新yum缓存
+yum clean al1 &amp;&amp; yum makecache
+
+#可以直接yum安装docker了
+## 查看源中可用版本
+yum list docker-ce --showduplicates | sort -r
+## yum安装
+yum install docker-ce -y
+##查看docker版本，验证是否验证成功
+docker -v
+</code></pre>
+<p><img src="/../image_3/4.png"></p>
+<p>6.配置镜像加速器</p>
+<pre><code>mkdir -p /etc/docker
+touch /etc/docker/daemon.json
+</code></pre>
+<pre><code>vim /etc/docker/daemon.json
+&#123;
+    &quot;registry-mirrors&quot; : [
+    &quot;https://8xpk5wnt.mirror.aliyuncs.com&quot;
+    ]
+&#125;
+</code></pre>
+<p>7.启动docker</p>
+<pre><code>#启动docker前，一定要关闭防火墙！！
+# 关闭
+systemctl stop firewalld
+# 禁止开机启动防火墙
+systemctl disable firewalld
+
+## 查看docker信息
+docker info
+docker ps
+docker images
+docker version
+
+## docker-client
+which docker
+## docker daemon
+ps aux |grep docker
+## containerd
+ps aux|grep containerd
+systemctl status containerd 
+</code></pre>
+<p><img src="/../image_3/5.png"></p>
+<p>7.docker初体验</p>
+<p>（1）查看本地的docker镜像</p>
+<pre><code>docker image ls 或 docker images
+</code></pre>
+<p>（2）可选择删除旧版本</p>
+<pre><code>docker rmi 镜像id
+</code></pre>
+<p>（3）搜索一下远程仓库中的镜像文件是否存在</p>
+<pre><code>docker search nginx
+</code></pre>
+<p>（4）拉取，下载镜像</p>
+<pre><code>docerk pull nginx 
+</code></pre>
+<p><img src="/../image_3/6.png"></p>
+<p>（5）查看镜像</p>
+<pre><code>docker images 
+</code></pre>
+<p><img src="/../image_3/7.png"></p>
+<p>（6）运行镜像，运行出具体内容，在容器中就跑着一个nginx服务</p>
+<pre><code>docker run 参数 镜像的名字/id
+-d 后台运行容器
+-p 80:80 端口映射，宿主机端口：容器内端口，访问宿主机的80端口，也就访问到容器中的80端口
+
+docker run -d -p 80:80 nginx
+会返回一个容器的id
+</code></pre>
+<p>（7）查看容器是否在运行</p>
+<pre><code>docker ps
+</code></pre>
+<p><img src="/../image_3/8.png"></p>
+<p>（8）访问网站</p>
+<p><code>192.168.88.161:80</code></p>
+<p><img src="/../image_3/9.png"></p>
+<h3 id="获取镜像"><a href="#获取镜像" class="headerlink" title="获取镜像"></a>获取镜像</h3><p>获取镜像，镜像托管仓库，好比yum源一样. 默认的docker仓库是，dockerhub ，有大量的优质的镜像，以及用户自己上传的镜像 centos容器 vim nginx 。提交为镜像，上传到dockehub</p>
+<pre><code>docker search centos
+
+##我们在获取redis镜像的时候，发现下载了多行信息，最终仅得到了一个完整的镜像文件
+[root@node3 ~]# docker pull redis
+[root@node3 ~]# docker images
+</code></pre>
+<p><img src="/../image_3/10.png"></p>
+<p><img src="/../image_3/11.png"></p>
+<h3 id="查看本地的镜像文件"><a href="#查看本地的镜像文件" class="headerlink" title="查看本地的镜像文件"></a>查看本地的镜像文件</h3><pre><code> docker images 
+
+ docker image ls
+</code></pre>
+<p><img src="/../image_3/12.png"></p>
+<h3 id="下载docker镜像"><a href="#下载docker镜像" class="headerlink" title="下载docker镜像"></a>下载docker镜像</h3><pre><code>docker pull centos # 默认的是 centos:latest
+
+docker pull centos:7.8.2003
+</code></pre>
+<p><img src="/../image_3/13.png"></p>
+<h3 id="查看docker镜像的存储路径"><a href="#查看docker镜像的存储路径" class="headerlink" title="查看docker镜像的存储路径"></a>查看docker镜像的存储路径</h3><pre><code>docker info |grep Root
+
+#Docker Root Dir: /var/lib/docker
+#具体位置
+ls /var/lib/docker/image/overlay2/imagedb/content/sha256
+
+docker images
+</code></pre>
+<p><img src="/../image_3/14.png"></p>
+<pre><code>记录 镜像 和容器的配置关系
+# 使用不同的镜像，生成容器# -it 开启一个交互式的终端--rm 容器退出时删除该容器
+#再运行一个7.8centos
+docker run -it --rm centos bash
+</code></pre>
+<p><img src="/../image_3/15.png"></p>
+<h3 id="查看所有镜像、具体镜像"><a href="#查看所有镜像、具体镜像" class="headerlink" title="查看所有镜像、具体镜像"></a>查看所有镜像、具体镜像</h3><pre><code>docker images
+docker images 镜像名
+</code></pre>
+<h3 id="指定tag查看"><a href="#指定tag查看" class="headerlink" title="指定tag查看"></a>指定tag查看</h3><pre><code>docker images centos:7.8.2003
+</code></pre>
+<h3 id="列出镜像id"><a href="#列出镜像id" class="headerlink" title="列出镜像id"></a>列出镜像id</h3><p>-q –quiet 列出id</p>
+<pre><code>docker images -q
+</code></pre>
+<h3 id="格式化显示镜像"><a href="#格式化显示镜像" class="headerlink" title="格式化显示镜像"></a>格式化显示镜像</h3><pre><code># 这是docker的模板语言，--format
+
+docker images --format &quot;&#123;&#123;.ID&#125;&#125;--&#123;&#123;.Repository&#125;&#125;&quot;
+
+[root@node3 ~]# docker images --format &quot;&#123;&#123;.ID&#125;&#125;--&#123;&#123;.Repository&#125;&#125;&quot;
+
+605c77e624dd--nginx
+7614ae9453d1--redis
+5d9483f9a7b2—mysql
+</code></pre>
+<p>运行容器，且进入容器内，且在容器内执行某个命令</p>
+<pre><code>[root@node1 ~]# docker run -it centos:7.8.2003 sh
+sh-4.2#
+sh-4.2#
+sh-4.2# cat /etc/redhat-release
+Centos Linux release 7.8.2003 (Core)
+</code></pre>
+<p><img src="/../image_3/16.png"></p>
+<p>开启一个容器，让它帮你运行某个程序，属于前台运行，会卡住一个终端</p>
+<pre><code>[root@node1 ~]# docker run centos:7.8.2003 ping baidu.com
+</code></pre>
+<p><img src="/../image_3/17.png"></p>
+<p>运行一个活着的容器，docker ps可以看到的容器</p>
+<pre><code># -d 参数，让容器在后台跑着 (针对宿主机而言)
+
+# 返回容器id
+docker run -d centos:7.8.2003 ping baidu.com
+
+docker run -d --rm --name pythonav centos:7.8.2003 pingpythonav.cn
+
+docke rps
+</code></pre>
+<p><img src="/../image_3/18.png"></p>
+<p><img src="/../image_3/19.png"></p>
+<p><img src="/../image_3/20.png"></p>
+<p>查看容器日志的玩法，刷新日志、查看最后五条</p>
+<pre><code># docker logs -f 容器id
+
+docker logs -f f2598cb26363
+docker logs f2598cb26363 | tail -5
+</code></pre>
+<p><img src="/../image_3/21.png"></p>
+<p><img src="/../image_3/22.png"></p>
+<p>查看容器的详细信息，用于高级的调试</p>
+<pre><code>docker container inspect 容器id
+</code></pre>
+<p><img src="/../image_3/23.png"></p>
+<p>容器的端口映射</p>
+<pre><code># 后台运行nginx容器，且起个名字，且端口映射宿主机的80端口，访问到容器内的80端口
+
+docker run -d --name bigdata_nginx -p 85:80 nginx
+
+# 查看容器
+[root@yc_docker81 ~]# docker ps
+</code></pre>
+<p><img src="/../image_3/24.png"></p>
+<p>查看容器的端口转发情况</p>
+<pre><code>docker port 容器id
+
+# docker port 2e73fac44507
+
+80/tcp -&gt; 0.0.0.0:85
+80/tcp -&gt; :::85
+</code></pre>
+<p>随机端口映射 -P 随机访问一个宿主机的空闲端口，映射到容器内打开的端口</p>
+<pre><code>docker run -d --name bigdata_nginx_random -P nginx
+</code></pre>
+<p><img src="/../image_3/25.png"></p>
+<p><img src="/../image_3/26.png"></p>
+<p>创建并运行nginx容器的命令：</p>
+<pre><code>docker run --name containerName -p 80:80 -d nginx
+</code></pre>
+<p>进入容器，进入我们刚刚创建的nginx容器的命令为</p>
+<pre><code>docker exec -it 25866bdfa0e3 bash   //25866bdfa0e3是容器的id
+</code></pre>
+<p><img src="/../image_3/27.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Docker/" data-id="clituffju00014wyx52e05h3q" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
+    <article id="post-Git" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/06/09/Git/">Git</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Git/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.485Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h1 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h1><h2 id="Git-的基本使用01-TortoiseGit-操作本地仓库"><a href="#Git-的基本使用01-TortoiseGit-操作本地仓库" class="headerlink" title="Git 的基本使用01-TortoiseGit 操作本地仓库"></a>Git 的基本使用01-TortoiseGit 操作本地仓库</h2><p>1.初始化仓库</p>
+<p>​        创建Git版本库创建完毕仓库,我们发现,此时我们创建的文件夹下有一个.git 文件已经生成了，并且仓库文件夹上多了一个 绿色图标。</p>
+<p>2.添加文件</p>
+<p>​        在仓库中新建一个文件，选中新建的文件–&gt;右键–&gt; TortoiseGit–&gt; 添加，此时我们看到文件夹上多了一个 “加号”。</p>
+<p>3.提交文件至本地文件</p>
+<p>选中文件，右键git提交<img src="/../image_2/1.png"></p>
+<p>4.修改文件，与再次提交文件</p>
+<p>​        当我们修改文件以后,文件上多了一个红色感叹号,表示我们上次提交后该文件被修改过提交后文件图标又变成绿色<img src="/../image_2/2.png"></p>
+<p>5.文件状态讲解</p>
+<p>6.修改文件，不提交和上一个版本比较差异</p>
+<p>修改文件,此时不要提交选中文件–&gt;右键–&gt; TortoiseGit–&gt; 比较差异</p>
+<p><img src="/../image_2/3.png"></p>
+<p>7.查看提交历史记录</p>
+<p>选中文件右键–&gt; TortoiseGit–&gt; 显示日志，此时我们可以看到所有的历史提交记录<img src="/../image_2/4.png"></p>
+<p>8.回退至历史版本</p>
+<p>右键–&gt; TortoiseGit–&gt; 显示日志，选中某个版本–&gt; 进行如下操作<img src="/../image_2/5.png"></p>
+<p>9.文件删除</p>
+<p>本地删除与恢复<img src="/../image_2/6.png"></p>
+<h2 id="Git-的基本使用02-TortoiseGit-操作本地仓库-分支"><a href="#Git-的基本使用02-TortoiseGit-操作本地仓库-分支" class="headerlink" title="Git 的基本使用02-TortoiseGit 操作本地仓库(分支)"></a>Git 的基本使用02-TortoiseGit 操作本地仓库(分支)</h2><p>1.创建分支</p>
+<p>到现在为止,我们一直使用的时主分支(master)在主分支上操作创建分支<img src="/../image_2/7.png"></p>
+<p>2.查看分支</p>
+<p>查看版本分支图,此时我们看到有两个分支<img src="/../image_2/8.png"></p>
+<p>3.切换分支</p>
+<p><img src="/../image_2/9.png"></p>
+<p>4.合并</p>
+<p>切换到 主版本，右键 合并即可将需求1 写的代码合并至主分支</p>
+<p><img src="/../image_2/10.png"></p>
+<p>5.删除分支</p>
+<p><img src="/../image_2/11.png"></p>
+<h2 id="tag标签"><a href="#tag标签" class="headerlink" title="tag标签"></a>tag标签</h2><p>1.标签的创建</p>
+<p><img src="/../image_2/12.png"></p>
+<p>2.标签的切换与删除</p>
+<p><img src="/../image_2/13.png"></p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>1.创建远程仓库</p>
+<p><img src="/../image_2/14.png"></p>
+<p>  <img src="/../image_2/15.png"></p>
+<p>2.把本地代码推送到云端</p>
+<p><img src="/../image_2/16.png"></p>
+<p>3.从远程仓库克隆代码</p>
+<p><img src="/../image_2/17.png"></p>
+<p>4.连接成功</p>
+<p><img src="/../image_2/18.png"></p>
+<p>5.推送本地仓库内容至远程仓库</p>
+<p><img src="/../image_2/19.png"></p>
+<p>6.克隆远程仓库到本地</p>
+<p><img src="/../image_2/20.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Git/" data-id="clituffk600024wyxhx8gfppl" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
     
     <article id="post-hello-world - 副本" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
@@ -117,7 +1265,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/06/07/hello-world%20-%20%E5%89%AF%E6%9C%AC/" data-id="clio061970001qwyx96334j77" class="article-share-link">
+      <a data-url="http://example.com/2023/06/07/hello-world%20-%20%E5%89%AF%E6%9C%AC/" data-id="clituffkb00094wyx79ie5fhk" class="article-share-link">
         Share
       </a>
       
@@ -182,7 +1330,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/06/07/hello-world/" data-id="clio0619b0002qwyx9t495x5s" class="article-share-link">
+      <a data-url="http://example.com/2023/06/07/hello-world/" data-id="clituffkc000a4wyx47w2hsrd" class="article-share-link">
         Share
       </a>
       
@@ -205,7 +1353,7 @@
     <footer class="footer">
   <div class="outer">
     <ul class="list-inline">
-      <li>Spark基础配置 &copy; 2023</li>
+      <li>谷明胜 &copy; 2023</li>
       
         <li>
           
@@ -231,7 +1379,7 @@
 <nav class="navbar">
   
   <div class="logo">
-    <a href="/"><img src="/images/hexo.svg" alt="Spark基础配置"></a>
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
   </div>
   
   <ul class="nav nav-main">

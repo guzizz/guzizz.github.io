@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Git |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Git" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Git
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Git/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.485Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h1><h2 id="Git-的基本使用01-TortoiseGit-操作本地仓库"><a href="#Git-的基本使用01-TortoiseGit-操作本地仓库" class="headerlink" title="Git 的基本使用01-TortoiseGit 操作本地仓库"></a>Git 的基本使用01-TortoiseGit 操作本地仓库</h2><p>1.初始化仓库</p>
+<p>​        创建Git版本库创建完毕仓库,我们发现,此时我们创建的文件夹下有一个.git 文件已经生成了，并且仓库文件夹上多了一个 绿色图标。</p>
+<p>2.添加文件</p>
+<p>​        在仓库中新建一个文件，选中新建的文件–&gt;右键–&gt; TortoiseGit–&gt; 添加，此时我们看到文件夹上多了一个 “加号”。</p>
+<p>3.提交文件至本地文件</p>
+<p>选中文件，右键git提交<img src="/../image_2/1.png"></p>
+<p>4.修改文件，与再次提交文件</p>
+<p>​        当我们修改文件以后,文件上多了一个红色感叹号,表示我们上次提交后该文件被修改过提交后文件图标又变成绿色<img src="/../image_2/2.png"></p>
+<p>5.文件状态讲解</p>
+<p>6.修改文件，不提交和上一个版本比较差异</p>
+<p>修改文件,此时不要提交选中文件–&gt;右键–&gt; TortoiseGit–&gt; 比较差异</p>
+<p><img src="/../image_2/3.png"></p>
+<p>7.查看提交历史记录</p>
+<p>选中文件右键–&gt; TortoiseGit–&gt; 显示日志，此时我们可以看到所有的历史提交记录<img src="/../image_2/4.png"></p>
+<p>8.回退至历史版本</p>
+<p>右键–&gt; TortoiseGit–&gt; 显示日志，选中某个版本–&gt; 进行如下操作<img src="/../image_2/5.png"></p>
+<p>9.文件删除</p>
+<p>本地删除与恢复<img src="/../image_2/6.png"></p>
+<h2 id="Git-的基本使用02-TortoiseGit-操作本地仓库-分支"><a href="#Git-的基本使用02-TortoiseGit-操作本地仓库-分支" class="headerlink" title="Git 的基本使用02-TortoiseGit 操作本地仓库(分支)"></a>Git 的基本使用02-TortoiseGit 操作本地仓库(分支)</h2><p>1.创建分支</p>
+<p>到现在为止,我们一直使用的时主分支(master)在主分支上操作创建分支<img src="/../image_2/7.png"></p>
+<p>2.查看分支</p>
+<p>查看版本分支图,此时我们看到有两个分支<img src="/../image_2/8.png"></p>
+<p>3.切换分支</p>
+<p><img src="/../image_2/9.png"></p>
+<p>4.合并</p>
+<p>切换到 主版本，右键 合并即可将需求1 写的代码合并至主分支</p>
+<p><img src="/../image_2/10.png"></p>
+<p>5.删除分支</p>
+<p><img src="/../image_2/11.png"></p>
+<h2 id="tag标签"><a href="#tag标签" class="headerlink" title="tag标签"></a>tag标签</h2><p>1.标签的创建</p>
+<p><img src="/../image_2/12.png"></p>
+<p>2.标签的切换与删除</p>
+<p><img src="/../image_2/13.png"></p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>1.创建远程仓库</p>
+<p><img src="/../image_2/14.png"></p>
+<p>  <img src="/../image_2/15.png"></p>
+<p>2.把本地代码推送到云端</p>
+<p><img src="/../image_2/16.png"></p>
+<p>3.从远程仓库克隆代码</p>
+<p><img src="/../image_2/17.png"></p>
+<p>4.连接成功</p>
+<p><img src="/../image_2/18.png"></p>
+<p>5.推送本地仓库内容至远程仓库</p>
+<p><img src="/../image_2/19.png"></p>
+<p>6.克隆远程仓库到本地</p>
+<p><img src="/../image_2/20.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Git/" data-id="clituffk600024wyxhx8gfppl" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Docker/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Docker
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/07/hello-world%20-%20%E5%89%AF%E6%9C%AC/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Hello World test</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

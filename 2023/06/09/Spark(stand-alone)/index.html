@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Spark（stand-alone） |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Spark(stand-alone)" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Spark（stand-alone）
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Spark(stand-alone)/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Spark（stand-alone）"><a href="#Spark（stand-alone）" class="headerlink" title="Spark（stand-alone）"></a>Spark（stand-alone）</h1><h2 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h2><p>1)集群规划</p>
+<p>课程中使用三台Linux虚拟机来组成集群环境，分别是:</p>
+<p>node1\ node2\ node3</p>
+<p>node1运行: Spark的Master进程  和 1个Worker进程</p>
+<p>node2运行: spark的1个worker进程</p>
+<p>node3运行: spark的1个worker进程</p>
+<p>整个集群提供: 1个master进程 和 3个worker进程</p>
+<p>2)安装Anaconda</p>
+<p>我已经安装完成就不在此安装了如图</p>
+<p> <img src="/../image_5/1.png"></p>
+<p>3)配置workers文件</p>
+<p>在<code>/export/server/spark/conf</code>目录下</p>
+<pre><code># 改名，去掉后面的.template后缀
+mv workers.template workers
+
+# 编辑worker文件
+vim workers
+# 将里面的localhost删除, 追加
+node1
+node2
+node3
+到workers文件内
+</code></pre>
+<p><img src="/../image_5/2.png"> </p>
+<p>4)配置spark-env.sh文件</p>
+<pre><code># 1. 改名
+mv spark-env.sh.template spark-env.sh
+
+# 2. 编辑spark-env.sh, 在底部追加如下内容
+
+## 设置JAVA安装目录
+JAVA_HOME=/export/server/jdk
+
+## HADOOP软件配置文件目录，读取HDFS上文件和运行YARN集群
+HADOOP_CONF_DIR=/export/server/hadoop/etc/hadoop
+YARN_CONF_DIR=/export/server/hadoop/etc/hadoop
+
+## 指定spark老大Master的IP和提交任务的通信端口
+# 告知Spark的master运行在哪个机器上
+export SPARK_MASTER_HOST=node1
+# 告知sparkmaster的通讯端口
+export SPARK_MASTER_PORT=7077
+# 告知spark master的 webui端口
+SPARK_MASTER_WEBUI_PORT=8080
+
+# worker cpu可用核数
+SPARK_WORKER_CORES=1
+# worker可用内存
+SPARK_WORKER_MEMORY=1g
+# worker的工作通讯地址
+SPARK_WORKER_PORT=7078
+# worker的 webui地址
+SPARK_WORKER_WEBUI_PORT=8081
+
+## 设置历史服务器
+# 配置的意思是  将spark程序运行的历史日志 存到hdfs的/sparklog文件夹中
+SPARK_HISTORY_OPTS=&quot;-Dspark.history.fs.logDirectory=hdfs://node1:8020/sparklog/ -Dspark.history.fs.cleaner.enabled=true&quot;
+</code></pre>
+<p><img src="/../image_5/3.png"></p>
+<p>5)在HDFS上创建程序运行历史记录存放的文件夹</p>
+<pre><code>hadoop fs -mkdir /sparklog
+hadoop fs -chmod 777 /sparklog
+</code></pre>
+<p><img src="/../image_5/4.png"></p>
+<p>6)配置spark-defaults.conf文件</p>
+<pre><code># 1. 改名
+mv spark-defaults.conf.template spark-defaults.conf
+
+# 2. 修改内容, 追加如下内容
+# 开启spark的日期记录功能
+spark.eventLog.enabled   true
+# 设置spark日志记录的路径
+spark.eventLog.dir   hdfs://node1:8020/sparklog/ 
+# 设置spark日志是否启动压缩
+spark.eventLog.compress   true
+</code></pre>
+<p><img src="/../image_5/5.png"> </p>
+<p>7)将Spark安装文件夹，分发到node1,node2上</p>
+<pre><code>scp -r spark-3.1.2-bin-hadoop3.2 node2:/export/server/
+scp -r spark-3.1.2-bin-hadoop3.2 node3:/export/server/
+</code></pre>
+<p>增加软连接</p>
+<pre><code>ln -s /export/server/spark-3.1.2-bin-hadoop3.2 /export/server/spark
+</code></pre>
+<p>8)启动历史服务器</p>
+<pre><code>sbin/start-history-server.sh
+</code></pre>
+<p>9)启动Spark的Master和worker进程</p>
+<pre><code># 启动全部master和worker
+sbin/start-all.sh
+</code></pre>
+<p>10)查看Master的WEB UI</p>
+<p><img src="/../image_5/6.png"> </p>
+<h2 id="连接到StandAlone集群"><a href="#连接到StandAlone集群" class="headerlink" title="连接到StandAlone集群"></a>连接到StandAlone集群</h2><h3 id="bin-x2F-spark"><a href="#bin-x2F-spark" class="headerlink" title="bin&#x2F;spark"></a>bin&#x2F;spark</h3><pre><code>bin/pyspark --master spark://node1:7077
+# 通过--master选项来连接到 StandAlone集群
+# 如果不写--master选项, 默认是local模式运行
+</code></pre>
+<p><img src="/../image_5/7.png"> </p>
+<h3 id="bin-x2F-spark-shell"><a href="#bin-x2F-spark-shell" class="headerlink" title="bin&#x2F;spark-shell"></a>bin&#x2F;spark-shell</h3><pre><code>bin/spark-shell --master spark://node1:7077
+# 同样适用--master来连接到集群使用
+</code></pre>
+<pre><code>// 测试代码
+sc.parallelize(Array(1,2,3,4,5)).map(x=&gt; x + 1).collect()
+</code></pre>
+<p><img src="/../image_5/8.png"> </p>
+<h3 id="bin-x2F-spark-submit-PI"><a href="#bin-x2F-spark-submit-PI" class="headerlink" title="bin&#x2F;spark-submit(PI)"></a>bin&#x2F;spark-submit(PI)</h3><pre><code>bin/spark-submit--masterspark://node1:7077/export/server/spark/examples/src/main/python/pi.py 100# 同样使用--master来指定将任务提交到集群运行
+</code></pre>
+<p><img src="/../image_5/9.png"> </p>
+<h2 id="查看历史服务器WEB-UI"><a href="#查看历史服务器WEB-UI" class="headerlink" title="查看历史服务器WEB UI"></a>查看历史服务器WEB UI</h2><p>浏览器打开：<code>node1:18080</code></p>
+<p><img src="/../image_5/10.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Spark(stand-alone)/" data-id="clituffkb00084wyx8los8hmf" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Spark(local)/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Spark（local）
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/09/Docker/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Docker</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

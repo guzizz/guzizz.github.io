@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Docker |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Docker" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Docker
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Docker/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.485Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><p>1.在安装docker之前，先初始化机器环境，如果之前安装过旧版本的docker，应该先使用命令进行卸载</p>
+<p>2.进行yum源配置</p>
+<pre><code>mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+
+wget -O/etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+wget -o/etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+
+yum clean all
+yum makecache
+</code></pre>
+<p><img src="/../image_3/1.png"></p>
+<p>3.安装docker，首先需要虚拟机联网，安装yum工具</p>
+<pre><code>yum install -y yum-utils \device-mapper-persistent-data \
+lvm2--skip-broken
+</code></pre>
+<p><img src="/../image_3/2.png"></p>
+<p>4.配置网卡转发</p>
+<p>（1）写入</p>
+<pre><code>cat &lt;&lt;EOF &gt; /etc/sysctl.d/docker.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.ip_forward=1
+EOF
+</code></pre>
+<p>（2）重新加载内核参数</p>
+<pre><code>modprobe br_netfilter
+</code></pre>
+<pre><code>sysctl -p /etc/sysctl.d/docker.conf
+</code></pre>
+<p>5.利用yum进行docker安装</p>
+<pre><code>curl-o/etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+cur-o/etc/yum.repos.d/Centos-7.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+</code></pre>
+<p><img src="/../image_3/3.png"></p>
+<pre><code>#更新yum缓存
+yum clean al1 &amp;&amp; yum makecache
+
+#可以直接yum安装docker了
+## 查看源中可用版本
+yum list docker-ce --showduplicates | sort -r
+## yum安装
+yum install docker-ce -y
+##查看docker版本，验证是否验证成功
+docker -v
+</code></pre>
+<p><img src="/../image_3/4.png"></p>
+<p>6.配置镜像加速器</p>
+<pre><code>mkdir -p /etc/docker
+touch /etc/docker/daemon.json
+</code></pre>
+<pre><code>vim /etc/docker/daemon.json
+&#123;
+    &quot;registry-mirrors&quot; : [
+    &quot;https://8xpk5wnt.mirror.aliyuncs.com&quot;
+    ]
+&#125;
+</code></pre>
+<p>7.启动docker</p>
+<pre><code>#启动docker前，一定要关闭防火墙！！
+# 关闭
+systemctl stop firewalld
+# 禁止开机启动防火墙
+systemctl disable firewalld
+
+## 查看docker信息
+docker info
+docker ps
+docker images
+docker version
+
+## docker-client
+which docker
+## docker daemon
+ps aux |grep docker
+## containerd
+ps aux|grep containerd
+systemctl status containerd 
+</code></pre>
+<p><img src="/../image_3/5.png"></p>
+<p>7.docker初体验</p>
+<p>（1）查看本地的docker镜像</p>
+<pre><code>docker image ls 或 docker images
+</code></pre>
+<p>（2）可选择删除旧版本</p>
+<pre><code>docker rmi 镜像id
+</code></pre>
+<p>（3）搜索一下远程仓库中的镜像文件是否存在</p>
+<pre><code>docker search nginx
+</code></pre>
+<p>（4）拉取，下载镜像</p>
+<pre><code>docerk pull nginx 
+</code></pre>
+<p><img src="/../image_3/6.png"></p>
+<p>（5）查看镜像</p>
+<pre><code>docker images 
+</code></pre>
+<p><img src="/../image_3/7.png"></p>
+<p>（6）运行镜像，运行出具体内容，在容器中就跑着一个nginx服务</p>
+<pre><code>docker run 参数 镜像的名字/id
+-d 后台运行容器
+-p 80:80 端口映射，宿主机端口：容器内端口，访问宿主机的80端口，也就访问到容器中的80端口
+
+docker run -d -p 80:80 nginx
+会返回一个容器的id
+</code></pre>
+<p>（7）查看容器是否在运行</p>
+<pre><code>docker ps
+</code></pre>
+<p><img src="/../image_3/8.png"></p>
+<p>（8）访问网站</p>
+<p><code>192.168.88.161:80</code></p>
+<p><img src="/../image_3/9.png"></p>
+<h3 id="获取镜像"><a href="#获取镜像" class="headerlink" title="获取镜像"></a>获取镜像</h3><p>获取镜像，镜像托管仓库，好比yum源一样. 默认的docker仓库是，dockerhub ，有大量的优质的镜像，以及用户自己上传的镜像 centos容器 vim nginx 。提交为镜像，上传到dockehub</p>
+<pre><code>docker search centos
+
+##我们在获取redis镜像的时候，发现下载了多行信息，最终仅得到了一个完整的镜像文件
+[root@node3 ~]# docker pull redis
+[root@node3 ~]# docker images
+</code></pre>
+<p><img src="/../image_3/10.png"></p>
+<p><img src="/../image_3/11.png"></p>
+<h3 id="查看本地的镜像文件"><a href="#查看本地的镜像文件" class="headerlink" title="查看本地的镜像文件"></a>查看本地的镜像文件</h3><pre><code> docker images 
+
+ docker image ls
+</code></pre>
+<p><img src="/../image_3/12.png"></p>
+<h3 id="下载docker镜像"><a href="#下载docker镜像" class="headerlink" title="下载docker镜像"></a>下载docker镜像</h3><pre><code>docker pull centos # 默认的是 centos:latest
+
+docker pull centos:7.8.2003
+</code></pre>
+<p><img src="/../image_3/13.png"></p>
+<h3 id="查看docker镜像的存储路径"><a href="#查看docker镜像的存储路径" class="headerlink" title="查看docker镜像的存储路径"></a>查看docker镜像的存储路径</h3><pre><code>docker info |grep Root
+
+#Docker Root Dir: /var/lib/docker
+#具体位置
+ls /var/lib/docker/image/overlay2/imagedb/content/sha256
+
+docker images
+</code></pre>
+<p><img src="/../image_3/14.png"></p>
+<pre><code>记录 镜像 和容器的配置关系
+# 使用不同的镜像，生成容器# -it 开启一个交互式的终端--rm 容器退出时删除该容器
+#再运行一个7.8centos
+docker run -it --rm centos bash
+</code></pre>
+<p><img src="/../image_3/15.png"></p>
+<h3 id="查看所有镜像、具体镜像"><a href="#查看所有镜像、具体镜像" class="headerlink" title="查看所有镜像、具体镜像"></a>查看所有镜像、具体镜像</h3><pre><code>docker images
+docker images 镜像名
+</code></pre>
+<h3 id="指定tag查看"><a href="#指定tag查看" class="headerlink" title="指定tag查看"></a>指定tag查看</h3><pre><code>docker images centos:7.8.2003
+</code></pre>
+<h3 id="列出镜像id"><a href="#列出镜像id" class="headerlink" title="列出镜像id"></a>列出镜像id</h3><p>-q –quiet 列出id</p>
+<pre><code>docker images -q
+</code></pre>
+<h3 id="格式化显示镜像"><a href="#格式化显示镜像" class="headerlink" title="格式化显示镜像"></a>格式化显示镜像</h3><pre><code># 这是docker的模板语言，--format
+
+docker images --format &quot;&#123;&#123;.ID&#125;&#125;--&#123;&#123;.Repository&#125;&#125;&quot;
+
+[root@node3 ~]# docker images --format &quot;&#123;&#123;.ID&#125;&#125;--&#123;&#123;.Repository&#125;&#125;&quot;
+
+605c77e624dd--nginx
+7614ae9453d1--redis
+5d9483f9a7b2—mysql
+</code></pre>
+<p>运行容器，且进入容器内，且在容器内执行某个命令</p>
+<pre><code>[root@node1 ~]# docker run -it centos:7.8.2003 sh
+sh-4.2#
+sh-4.2#
+sh-4.2# cat /etc/redhat-release
+Centos Linux release 7.8.2003 (Core)
+</code></pre>
+<p><img src="/../image_3/16.png"></p>
+<p>开启一个容器，让它帮你运行某个程序，属于前台运行，会卡住一个终端</p>
+<pre><code>[root@node1 ~]# docker run centos:7.8.2003 ping baidu.com
+</code></pre>
+<p><img src="/../image_3/17.png"></p>
+<p>运行一个活着的容器，docker ps可以看到的容器</p>
+<pre><code># -d 参数，让容器在后台跑着 (针对宿主机而言)
+
+# 返回容器id
+docker run -d centos:7.8.2003 ping baidu.com
+
+docker run -d --rm --name pythonav centos:7.8.2003 pingpythonav.cn
+
+docke rps
+</code></pre>
+<p><img src="/../image_3/18.png"></p>
+<p><img src="/../image_3/19.png"></p>
+<p><img src="/../image_3/20.png"></p>
+<p>查看容器日志的玩法，刷新日志、查看最后五条</p>
+<pre><code># docker logs -f 容器id
+
+docker logs -f f2598cb26363
+docker logs f2598cb26363 | tail -5
+</code></pre>
+<p><img src="/../image_3/21.png"></p>
+<p><img src="/../image_3/22.png"></p>
+<p>查看容器的详细信息，用于高级的调试</p>
+<pre><code>docker container inspect 容器id
+</code></pre>
+<p><img src="/../image_3/23.png"></p>
+<p>容器的端口映射</p>
+<pre><code># 后台运行nginx容器，且起个名字，且端口映射宿主机的80端口，访问到容器内的80端口
+
+docker run -d --name bigdata_nginx -p 85:80 nginx
+
+# 查看容器
+[root@yc_docker81 ~]# docker ps
+</code></pre>
+<p><img src="/../image_3/24.png"></p>
+<p>查看容器的端口转发情况</p>
+<pre><code>docker port 容器id
+
+# docker port 2e73fac44507
+
+80/tcp -&gt; 0.0.0.0:85
+80/tcp -&gt; :::85
+</code></pre>
+<p>随机端口映射 -P 随机访问一个宿主机的空闲端口，映射到容器内打开的端口</p>
+<pre><code>docker run -d --name bigdata_nginx_random -P nginx
+</code></pre>
+<p><img src="/../image_3/25.png"></p>
+<p><img src="/../image_3/26.png"></p>
+<p>创建并运行nginx容器的命令：</p>
+<pre><code>docker run --name containerName -p 80:80 -d nginx
+</code></pre>
+<p>进入容器，进入我们刚刚创建的nginx容器的命令为</p>
+<pre><code>docker exec -it 25866bdfa0e3 bash   //25866bdfa0e3是容器的id
+</code></pre>
+<p><img src="/../image_3/27.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Docker/" data-id="clituffju00014wyx52e05h3q" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Spark(stand-alone)/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Spark（stand-alone）
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/09/Git/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Git</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

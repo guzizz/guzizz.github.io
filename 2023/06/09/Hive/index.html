@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="Spark实训">
+  
+  <title>
+    Hive |
+    
+    谷明胜
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-Hive" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    Hive
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/06/09/Hive/" class="article-date">
+  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h1><p>​        本地模式部署本质上是将Hive默认的元数据存储介质由内嵌的Derby数据库替换为独立数据库，即MySQL数据库。本地模式部署Hive需要在一台虚拟机上同时安装MySQL和Hive，接下来，我们以虚拟机node2为例，使用本地模式部署Hive。</p>
+<h2 id="卸载原有MySQL组件"><a href="#卸载原有MySQL组件" class="headerlink" title="卸载原有MySQL组件"></a>卸载原有MySQL组件</h2><p>(1)查看MySQL服务状态</p>
+<pre><code>systemctl status mysqld.service
+</code></pre>
+<p><img src="/../image_1/1.png"></p>
+<p>(2)关闭MySQL服务</p>
+<pre><code>sudo systemctl stop mysqld.service
+</code></pre>
+<p><img src="/../image_1/2.png"></p>
+<p>(3)查找安装mysql的rpm包并卸载</p>
+<pre><code>rpm -qa | grep -i mysql
+</code></pre>
+<p><img src="/../image_1/3.png"></p>
+<p>卸载</p>
+<pre><code>yum remove mysql-community-libs-5.7.29-1.el7.x86_64
+
+mysql-community-common-5.7.29-1.el7.x86_64 mysql-community-client-5.7.29-1.el7.x86_64 mysql-community-server-5.7.29-1.el7.x86_64
+</code></pre>
+<p>(4)查找mysql相关目录 删除</p>
+<pre><code>find / -name mysql
+
+rm -rf /var/lib/mysql
+rm -rf /var/lib/mysql/mysql
+rm -rf /usr/share/mysql
+</code></pre>
+<p><img src="/../image_1/4.png"></p>
+<h2 id="MySQL安装"><a href="#MySQL安装" class="headerlink" title="MySQL安装"></a>MySQL安装</h2><p>(1) 在<code>/export/server/</code>目录下创建mysql目录，并上传MySQL压缩包</p>
+<pre><code>mkdir /export/server/mysql 
+
+sudo rz
+</code></pre>
+<p><img src="/../image_1/5.png"></p>
+<p>(2) 解压<code>mysql-5.7.29-1.el7.x86_64.rpm-bundle.tar</code> 到上述文件夹</p>
+<pre><code>tar xvf mysql-5.7.29-1.el7.x86_64.rpm-bundle.tar
+</code></pre>
+<p><img src="/../image_1/6.png"> </p>
+<p>(3) 执行安装</p>
+<pre><code>yum -y install libaio
+</code></pre>
+<p><img src="/../image_1/7.png"></p>
+<pre><code>rpm -ivh 
+
+mysql-community-common-5.7.29-1.el7.x86_64.rpm mysql-community-libs-5.7.29-1.el7.x86_64.rpm mysql-community-client-5.7.29-1.el7.x86_64.rpm mysql-community-server-5.7.29-1.el7.x86_64.rpm
+</code></pre>
+<p><img src="/../image_1/8.png"></p>
+<p>(5)MySQL初始化</p>
+<p>&lt;1&gt;初始化</p>
+<pre><code>mysqld --initialize
+</code></pre>
+<p>&lt;2&gt; 更改所属组</p>
+<pre><code>chown mysql:mysql /var/lib/mysql -R
+</code></pre>
+<p>&lt;3&gt;启动mysql</p>
+<pre><code>systemctl start mysqld.service
+</code></pre>
+<p>&lt;4&gt;查看生成的临时root密码</p>
+<pre><code>cat  /var/log/mysqld.log
+</code></pre>
+<p><img src="/../image_1/9.png"></p>
+<p>(6)登录MySQL</p>
+<pre><code>mysql -u root -p
+</code></pre>
+<p>这里输入在日志中生成的密码</p>
+<p>(7)更新root密码，设置为hadoop</p>
+<pre><code>alter user user() identified by &quot;hadoop&quot;;
+</code></pre>
+<p><img src="/../image_1/10.png"></p>
+<p>(8)授权</p>
+<pre><code>use mysql;
+
+GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;%&#39; IDENTIFIED BY &#39;hadoop&#39; WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+</code></pre>
+<h2 id="Hive安装"><a href="#Hive安装" class="headerlink" title="Hive安装"></a>Hive安装</h2><p>(1)上传压缩包 解压 设置软链接</p>
+<pre><code>tar zxvf apache-hive-3.1.2-bin.tar.gz
+
+ln -s apache-hive-3.1.2-bin hive
+</code></pre>
+<p><img src="/../image_1/11.png"></p>
+<p> <img src="/../image_1/12.png"></p>
+<p>(2)处理hive与Hadoop之间guava版本的差异</p>
+<pre><code>cd /export/server/hive/
+
+rm -rf lib/guava-19.0.jar
+
+cp /export/server/hadoop/share/hadoop/common/lib/guava-27.0-jre.jar ./lib/
+</code></pre>
+<p><img src="/../image_1/13.png"></p>
+<p>(3)修改配置文件</p>
+<p>Hive-env.sh</p>
+<pre><code>cd /export/server/hive/conf
+
+mv hive-env.sh.template hive-env.sh
+</code></pre>
+<pre><code>vim hive-env.sh
+
+export HADOOP_HOME=/export/server/hadoop
+export HIVE_CONF_DIR=/export/server/hive/conf
+export HIVE_AUX_JARS_PATH=/export/server/hive/lib
+</code></pre>
+<p><img src="/../image_1/14.png"></p>
+<p>Hive-site.xml</p>
+<pre><code>&lt;configuration&gt;
+&lt;!-- 存储元数据mysql相关配置 --&gt;
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+  &lt;value&gt;jdbc:mysql://node1:3306/hive3?createDatabaseIfNotExist=true&amp;useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
+  &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+  &lt;value&gt;root&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionPassword&lt;/name&gt;
+  &lt;value&gt;hadoop&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- H2S运行绑定host --&gt;
+&lt;property&gt;
+  &lt;name&gt;hive.server2.thrift.bind.host&lt;/name&gt;
+  &lt;value&gt;node1&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- 远程模式部署metastore metastore地址 --&gt;
+&lt;property&gt;
+  &lt;name&gt;hive.metastore.uris&lt;/name&gt;
+  &lt;value&gt;thrift://node1:9083&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;!-- 关闭元数据存储授权  --&gt; 
+&lt;property&gt;
+  &lt;name&gt;hive.metastore.event.db.notification.api.auth&lt;/name&gt;
+  &lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+<p><img src="/../image_1/15.png"></p>
+<p>(4)上传mysql jdbc驱动到hive&#x2F;lib目录下</p>
+<pre><code>mysql-connector-java-5.1.32.jar
+</code></pre>
+<p><img src="/../image_1/16.png"></p>
+<p>(5)在hdfs创建hive储存目录</p>
+<pre><code>hadoop fs -mkdir /tmp
+hadoop fs -mkdir -p /user/hive/warehouse
+hadoop fs -chmod g+w /tmp
+hadoop fs -chmod g+w /user/hive/warehouse
+</code></pre>
+<h2 id="Hive启动"><a href="#Hive启动" class="headerlink" title="Hive启动"></a>Hive启动</h2><p>(1)启动metastore服务</p>
+<p>&lt;1&gt; 前台启动  关闭ctrl+c</p>
+<pre><code>/export/server/hive/bin/hive --service metastore
+</code></pre>
+<p>&lt;2&gt; 前台启动开启debug日志</p>
+<pre><code>/export/server/hive/bin/hive --service metastore --hiveconf 
+</code></pre>
+<pre><code>hive.root.logger=DEBUG,console  
+</code></pre>
+<p><img src="/../image_1/17.png"></p>
+<p><img src="/../image_1/18.png"></p>
+<p>&lt;3&gt; 后台启动 进程挂起  关闭使用jps+ kill -9</p>
+<pre><code>nohup /export/server/hive/bin/hive --service metastore &amp;
+</code></pre>
+<p><img src="/../image_1/19.png"></p>
+<p>(2)启动hiveserver2服务</p>
+<pre><code>nohup /export/server/hive/bin/hive --service hiveserver2 &amp;
+</code></pre>
+<p>【注】启动hiveserver2后，等待一段时间后再启动beeline连接，否则可能会连接不上</p>
+<p>(3)Beeline客户端连接</p>
+<pre><code>/export/server/hive/bin/beeline
+
+beeline&gt; ! connect jdbc:hive2://node1:10000
+beeline&gt; root
+beeline&gt; 直接回车
+</code></pre>
+<p>【注】启动hive之前先jps检查hdfs集群是否则正常运行，否则会连接错误。</p>
+<p><img src="/../image_1/20.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/06/09/Hive/" data-id="clituffk800044wyxgrno173m" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/06/09/Spark(HA)/" class="article-nav-link">
+    <strong class="article-nav-caption">Newer</strong>
+    <div class="article-nav-title">
+      
+      Spark（HA）
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/06/09/Spark(Pyspark%E5%9F%BA%E7%A1%80%E7%BC%96%E7%A0%81%E7%8E%AF%E5%A2%83)/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">Spark（Pyspark基础编码环境）</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>谷明胜 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="谷明胜"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>
