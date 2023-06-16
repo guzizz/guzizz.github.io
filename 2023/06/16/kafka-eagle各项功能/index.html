@@ -10,7 +10,7 @@
   <meta name="description" content="Spark实训">
   
   <title>
-    Spark（HA） |
+    kafka-eagle各项功能 |
     
     谷明胜
   </title>
@@ -34,7 +34,7 @@
 <body>
   <main class="content">
     <section class="outer">
-  <article id="post-Spark(HA)" class="article article-type-post" itemscope
+  <article id="post-kafka-eagle各项功能" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -43,7 +43,7 @@
       
   
   <h1 class="article-title" itemprop="name">
-    Spark（HA）
+    kafka-eagle各项功能
   </h1>
   
   
@@ -53,8 +53,8 @@
 
     
     <div class="article-meta">
-      <a href="/2023/06/09/Spark(HA)/" class="article-date">
-  <time datetime="2023-06-09T05:06:50.497Z" itemprop="datePublished">2023-06-09</time>
+      <a href="/2023/06/16/kafka-eagle%E5%90%84%E9%A1%B9%E5%8A%9F%E8%83%BD/" class="article-date">
+  <time datetime="2023-06-16T01:43:51.737Z" itemprop="datePublished">2023-06-16</time>
 </a>
       
     </div>
@@ -70,28 +70,21 @@
       
       
       
-        <h1 id="Spark（HA）"><a href="#Spark（HA）" class="headerlink" title="Spark（HA）"></a>Spark（HA）</h1><h2 id="Spark-StandAlone-HA-环境搭建"><a href="#Spark-StandAlone-HA-环境搭建" class="headerlink" title="Spark StandAlone HA 环境搭建"></a>Spark StandAlone HA 环境搭建</h2><p>启动Zookeeper服务和HDFS集群</p>
-<p><img src="/../image_6/1.png"></p>
-<p><code>cd /export/server/spark/conf </code>中<code>vi spark-env.sh </code>将其中的<code>SPARK_MASTER_HOST=node1</code>删除，并增加如下信息，以达到可以用到zookeeper的动态切换master功能</p>
-<p><img src="/../image_6/2.png"></p>
-<p>通过命令<code>scp spark-env.sh node2:/export/server/spark/conf/</code></p>
-<p><code>scp spark-env.sh node3:/export/server/spark/conf/</code>将<code>spark-env.sh</code>分发到node2和node3上，且若是StandAlone集群是启动中的话，通过<code>sbin/stop-all.sh</code>命令将StandAlone集群停止</p>
-<p>在node1上启动一个master进程和全部的worker进程</p>
-<p><img src="/../image_6/3.png"></p>
-<p><img src="/../image_6/4.png"></p>
-<p>在node2上启动一个备用的master进程</p>
-<p><img src="/../image_6/5.png"></p>
-<p><img src="/../image_6/6.png"></p>
-<p>使用<code>bin/spark-submit --master spark://node1:7077 /export/server/spark/examples/src/main/python/pi.py 1000</code>命令提交一个spark任务到正在运行的master上，在完成提交后使用命令kill掉node1上的master进程，并等待node2上的备用的master进程来接收并完成这个spark任务。</p>
-<p><img src="/../image_6/7.png"></p>
-<p><img src="/../image_6/8.png"></p>
-<p>测试</p>
-<p><img src="/../image_6/9.png"></p>
+        <h1 id="Kafka-Eagle"><a href="#Kafka-Eagle" class="headerlink" title="Kafka-Eagle"></a>Kafka-Eagle</h1><p>Kafka Eagle 是一个基于 Web 的 Kafka 集群管理系统，它提供了丰富的功能和工具来监控和管理 Kafka 集群。下面我们将对 Kafka Eagle 的各项功能进行介绍。</p>
+<h2 id="集群管理"><a href="#集群管理" class="headerlink" title="集群管理"></a>集群管理</h2><p>在 Kafka Eagle 中，可以通过集群管理功能来管理 Kafka 集群。通过该功能，用户可以对已有的集群进行添加、修改或者删除操作。</p>
+<p>消费者管理</p>
+<p>Kafka Eagle 提供了消费者管理功能，用户可以通过该功能来监控消费者的状态、消费者组的状态、消费者组分区的状态以及消费者消费的最新偏移量等信息。</p>
+<h2 id="主题管理"><a href="#主题管理" class="headerlink" title="主题管理"></a>主题管理</h2><p>在 Kafka Eagle 中，用户可以通过主题管理功能来创建主题、查看主题的基本信息、修改主题配置、删除主题等操作。此外，该功能还允许用户查看主题的日志和主题分区的信息。</p>
+<h2 id="消息查询"><a href="#消息查询" class="headerlink" title="消息查询"></a>消息查询</h2><p>通过消息查询功能，用户可以在 Kafka 上搜索消息并查看消息的详细信息。该功能支持对消息的关键字进行搜索，并能够按照时间范围、主题名称、消费者组编号等条件来过滤搜索结果。</p>
+<h2 id="指标监测"><a href="#指标监测" class="headerlink" title="指标监测"></a>指标监测</h2><p>Kafka Eagle 提供了指标监测功能，可以对 Kafka 集群进行性能监测和数据采集。用户可以通过该功能来监测 Kafka 集群的生产和消费情况、主题分区状态、网络流量和磁盘使用情况等指标信息。</p>
+<h2 id="偏移量管理"><a href="#偏移量管理" class="headerlink" title="偏移量管理"></a>偏移量管理</h2><p>通过偏移量管理功能，用户可以监测 Kafka 消费者组的状态和消费情况，并可视化地显示消费者组的消费偏移量。此外，该功能还提供了偏移量修正、偏移量删除等功能。</p>
+<h2 id="告警管理"><a href="#告警管理" class="headerlink" title="告警管理"></a>告警管理</h2><p>通过告警管理功能，用户可以设置告警条件，并在符合条件时发送通知信息。例如，当 Kafka 集群的某个指标值超过预先设置的阈值时，就会发送警报。</p>
+<p>综上所述，Kafka Eagle 作为一个功能齐全的 Kafka 集群管理系统，提供了丰富的功能和工具来监控和管理 Kafka 集群。Kafka Eagle 的功能非常丰富，用起来也相对简单，适合各种规</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2023/06/09/Spark(HA)/" data-id="clixxbc130006royxdslnfoup" class="article-share-link">
+      <a data-url="http://example.com/2023/06/16/kafka-eagle%E5%90%84%E9%A1%B9%E5%8A%9F%E8%83%BD/" data-id="clixxbc18000droyx559a0wfe" class="article-share-link">
         Share
       </a>
       
@@ -103,19 +96,19 @@
   
 <nav class="article-nav">
   
-  <a href="/2023/06/09/Hive/" class="article-nav-link">
+  <a href="/2023/06/16/Kafka%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C/" class="article-nav-link">
     <strong class="article-nav-caption">Newer</strong>
     <div class="article-nav-title">
       
-      Hive
+      Kafka命令行操作
       
     </div>
   </a>
   
   
-  <a href="/2023/06/09/Spark(Yarn)/" class="article-nav-link">
+  <a href="/2023/06/09/Hive/" class="article-nav-link">
     <strong class="article-nav-caption">Older</strong>
-    <div class="article-nav-title">Spark（Yarn）</div>
+    <div class="article-nav-title">Hive</div>
   </a>
   
 </nav>
